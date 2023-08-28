@@ -15,6 +15,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primaryColor: Colors.purple[400],
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: Colors.deepOrange,
+        ),
+        fontFamily: 'Lato',
+      ),
       home: ProductsOverviewPage(),
     );
   }
