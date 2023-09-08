@@ -1,34 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:shop/data/dummy_data.dart';
-import 'package:shop/models/product.dart';
 
-import '../components/product_item.dart';
+import '../components/product_grid.dart';
 
-class ProductsOverviewPage extends StatelessWidget {
-  final List<Product> loadedProducts = dummyProducts;
+enum FilterOptions {
+  favorite,
+  all,
+}
 
-  ProductsOverviewPage({
+class ProductsOverviewPage extends StatefulWidget {
+  const ProductsOverviewPage({
     super.key,
   });
+
+  @override
+  State<ProductsOverviewPage> createState() => _ProductsOverviewPageState();
+}
+
+class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
+  bool _showFavoriteOnly = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Minha Loja'),
+        actions: [
+          PopupMenuButton(
+            icon: const Icon(Icons.more_vert),
+            itemBuilder: (_) => [
+              const PopupMenuItem(
+                value: FilterOptions.favorite,
+                child: Text('Somente Favoritos'),
+              ),
+              const PopupMenuItem(
+                value: FilterOptions.all,
+                child: Text('Todos'),
+              ),
+            ],
+            onSelected: (FilterOptions selectedValue) {
+              setState(() {
+                if (selectedValue == FilterOptions.favorite) {
+                  _showFavoriteOnly = true;
+                } else {
+                  _showFavoriteOnly = false;
+                }
+              });
+            },
+          ),
+        ],
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(10),
-        itemCount: loadedProducts.length,
-        itemBuilder: (context, index) => ProductItem(
-          product: loadedProducts[index],
-        ),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 3 / 2,
-          mainAxisSpacing: 10,
-          crossAxisSpacing: 10,
-        ),
+      body: ProductGrid(
+        showFavoriteOnly: _showFavoriteOnly,
       ),
     );
   }
