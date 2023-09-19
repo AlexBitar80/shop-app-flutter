@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/components/cart_item_widget.dart';
 
 import '../models/cart.dart';
 
@@ -24,7 +25,10 @@ class CartPage extends StatelessWidget {
       body: Column(
         children: [
           Card(
-            margin: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(
+              horizontal: 15,
+              vertical: 20,
+            ),
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: Row(
@@ -65,7 +69,9 @@ class CartPage extends StatelessWidget {
               child: ListView.builder(
                 itemCount: items.length,
                 itemBuilder: (context, index) {
-                  return Text(items[index].name);
+                  return CardItemWidget(
+                    cartItem: items[index],
+                  );
                 },
               ),
             ),
