@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          primaryColor: Colors.purple[400],
+          useMaterial3: false,
           colorScheme: ColorScheme.fromSwatch().copyWith(
             secondary: Colors.deepOrange,
           ),
