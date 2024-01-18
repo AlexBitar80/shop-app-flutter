@@ -5,8 +5,8 @@ import 'package:shop/models/product.dart';
 
 import '../utils/app_routes.dart';
 
-class ProductItem extends StatelessWidget {
-  const ProductItem({
+class ProductGridItem extends StatelessWidget {
+  const ProductGridItem({
     super.key,
   });
 
@@ -40,6 +40,19 @@ class ProductItem extends StatelessWidget {
           trailing: IconButton(
             onPressed: () {
               cart.addItem(product);
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Produto adicionado com sucesso!'),
+                  duration: const Duration(seconds: 2),
+                  action: SnackBarAction(
+                    label: 'DESFAZER',
+                    onPressed: () {
+                      cart.removeSingleItem(product.id);
+                    },
+                  ),
+                ),
+              );
             },
             icon: const Icon(Icons.shopping_cart),
             color: Theme.of(context).colorScheme.secondary,
