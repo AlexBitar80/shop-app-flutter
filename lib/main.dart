@@ -10,6 +10,7 @@ import 'package:shop/utils/app_routes.dart';
 
 import 'models/cart.dart';
 import 'pages/cart_page.dart';
+import 'pages/product_form_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,6 +51,7 @@ class MyApp extends StatelessWidget {
           AppRoutes.cart: (ctx) => const CartPage(),
           AppRoutes.orders: (ctx) => const OrdersPage(),
           AppRoutes.products: (ctx) => const ProductPage(),
+          AppRoutes.product_form: (ctx) => const ProductFormPage(),
         },
       ),
     );
