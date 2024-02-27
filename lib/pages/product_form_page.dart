@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/models/product.dart';
 
 import 'package:shop/models/product_list.dart';
 
@@ -21,12 +22,34 @@ class _ProductFormPageState extends State<ProductFormPage> {
   final _formKey = GlobalKey<FormState>();
   final _imageUrlFocus = FocusNode();
 
-  final formData = <String, Object>{};
+  final _formData = <String, Object>{};
 
   @override
   void initState() {
     super.initState();
     _imageUrlFocus.addListener(updateImage);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_formData.isEmpty) {
+      final argument = ModalRoute.of(context)?.settings.arguments;
+
+      if (argument != null) {
+        final product = argument as Product;
+
+        _formData['id'] = product.id;
+        _formData['name'] = product.name;
+        _formData['description'] = product.description;
+        _formData['price'] = product.price;
+        _formData['imageUrl'] = product.imageUrl;
+
+        _imageController.text = product.imageUrl;
+        _descriptionController.text = product.description;
+      }
+    }
   }
 
   @override
@@ -51,7 +74,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
     Provider.of<ProductList>(
       context,
       listen: false,
-    ).addProductFromData(data: formData);
+    ).saveProduct(data: _formData);
 
     Navigator.of(context).pop();
   }
@@ -69,11 +92,12 @@ class _ProductFormPageState extends State<ProductFormPage> {
           child: ListView(
             children: [
               TextFormField(
+                initialValue: (_formData['name'] ?? '') as String,
                 decoration: const InputDecoration(
                   labelText: 'Título',
                 ),
                 textInputAction: TextInputAction.next,
-                onSaved: (name) => formData['name'] = name ?? '',
+                onSaved: (name) => _formData['name'] = name ?? '',
                 validator: (value) {
                   if (value?.trim().isEmpty ?? true) {
                     return 'Informe um título válido';
@@ -87,9 +111,9 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 },
               ),
               TextFormField(
+                initialValue: _formData['price']?.toString() ?? '0.0',
                 decoration: const InputDecoration(
                   labelText: 'Preço',
-                  // prefix: Text('R\$ '),
                 ),
                 textInputAction: TextInputAction.next,
                 inputFormatters: [
@@ -104,7 +128,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                       value?.replaceAll(RegExp(r'[^\d,]'), '') ?? '0';
                   final parsedValue =
                       double.tryParse(cleanedValue.replaceAll(',', '.')) ?? 0.0;
-                  formData['price'] = parsedValue;
+                  _formData['price'] = parsedValue;
                 },
                 validator: (value) {
                   final cleanedValue =
@@ -127,7 +151,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                 keyboardType: TextInputType.multiline,
                 controller: _descriptionController,
                 onSaved: (description) =>
-                    formData['description'] = description ?? '',
+                    _formData['description'] = description ?? '',
                 validator: (value) {
                   if (value?.trim().isEmpty ?? true) {
                     return 'Informe uma descrição válida';
@@ -149,7 +173,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                       textInputAction: TextInputAction.next,
                       onFieldSubmitted: (_) => _submitForm(),
                       onSaved: (imageUrl) =>
-                          formData['imageUrl'] = imageUrl ?? '',
+                          _formData['imageUrl'] = imageUrl ?? '',
                       validator: (value) {
                         if (value?.trim().isEmpty ?? true) {
                           return 'Informe uma URL válida';
