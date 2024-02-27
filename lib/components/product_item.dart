@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop/components/alert_shop.dart';
 import 'package:shop/models/product_list.dart';
 import 'package:shop/utils/app_routes.dart';
 
@@ -40,10 +41,23 @@ class ProductItem extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {
-                  Provider.of<ProductList>(
-                    context,
-                    listen: false,
-                  ).removeProduct(product);
+                  showDialog(
+                    context: context,
+                    builder: (ctx) {
+                      return AlertShopDialog(
+                        title: product.name,
+                        content: 'Deseja realmente remover o produto?',
+                        cancelFunction: () {
+                          Navigator.of(ctx).pop();
+                        },
+                        confirmFunction: () {
+                          Provider.of<ProductList>(context, listen: false)
+                              .removeProduct(product);
+                          Navigator.of(ctx).pop();
+                        },
+                      );
+                    },
+                  );
                 },
                 icon: const Icon(Icons.delete),
                 color: Theme.of(context)
