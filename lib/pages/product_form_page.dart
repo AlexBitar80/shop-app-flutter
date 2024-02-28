@@ -128,6 +128,7 @@ class _ProductFormPageState extends State<ProductFormPage> {
                       value?.replaceAll(RegExp(r'[^\d,]'), '') ?? '0';
                   final parsedValue =
                       double.tryParse(cleanedValue.replaceAll(',', '.')) ?? 0.0;
+                  parsedValue.toStringAsFixed(2);
                   _formData['price'] = parsedValue;
                 },
                 validator: (value) {
@@ -199,11 +200,8 @@ class _ProductFormPageState extends State<ProductFormPage> {
                     alignment: Alignment.center,
                     child: _imageController.text.isEmpty
                         ? const Text('Informe a URL')
-                        : FittedBox(
-                            fit: BoxFit.cover,
-                            child: Image.network(
-                              _imageController.text,
-                            ),
+                        : Image.network(
+                            _imageController.text,
                           ),
                   )
                 ],
