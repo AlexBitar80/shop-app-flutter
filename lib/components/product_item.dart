@@ -4,6 +4,7 @@ import 'package:shop/components/alert_shop.dart';
 import 'package:shop/models/product_list.dart';
 import 'package:shop/utils/app_routes.dart';
 
+import '../exceptions/custom_http_exception.dart';
 import '../models/product.dart';
 
 class ProductItem extends StatelessWidget {
@@ -16,6 +17,7 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final message = ScaffoldMessenger.of(context);
     return Card(
       elevation: 2,
       child: ListTile(
@@ -50,10 +52,21 @@ class ProductItem extends StatelessWidget {
                         cancelFunction: () {
                           Navigator.of(ctx).pop();
                         },
-                        confirmFunction: () {
-                          Provider.of<ProductList>(context, listen: false)
-                              .removeProduct(product);
-                          Navigator.of(ctx).pop();
+                        confirmFunction: () async {
+                          try {
+                            Navigator.of(ctx).pop();
+                            await Provider.of<ProductList>(context,
+                                    listen: false)
+                                .removeProduct(product);
+                          } on CustomHttpException catch (error) {
+                            message.showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  error.toString(),
+                                ),
+                              ),
+                            );
+                          }
                         },
                       );
                     },
