@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -53,17 +54,19 @@ class _OrderWidgetState extends State<OrderWidget> {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
+                        AutoSizeText(
+                          minFontSize: 10,
+                          maxFontSize: 20,
                           product.name,
                           style: const TextStyle(
-                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
+                        AutoSizeText(
+                          minFontSize: 10,
+                          maxFontSize: 20,
                           '${product.quantity}x R\$ ${product.price}',
                           style: const TextStyle(
-                            fontSize: 18,
                             color: Colors.grey,
                           ),
                         ),
