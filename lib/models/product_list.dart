@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:shop/data/dummy_data.dart';
+import 'package:shop/exceptions/custom_http_exception.dart';
 import 'package:shop/models/product.dart';
+import 'package:http/http.dart' as http;
+import 'package:shop/utils/constants.dart';
 
 class ProductList with ChangeNotifier {
-  final List<Product> _items = dummyProducts;
+  final _baseUrl = Constantes.product_base_url;
+  final List<Product> _items = [];
 
   List<Product> get items => [..._items];
   List<Product> get favoriteItems => _items
@@ -14,7 +19,7 @@ class ProductList with ChangeNotifier {
       )
       .toList();
 
-  void saveProduct({required Map<String, Object> data}) {
+  Future<void> saveProduct({required Map<String, Object> data}) async {
     bool hasId = data['id'] != null;
 
     final product = Product(
@@ -26,29 +31,93 @@ class ProductList with ChangeNotifier {
     );
 
     if (hasId) {
-      updateProduct(product);
+      return updateProduct(product);
     } else {
-      addProduct(product);
+      return addProduct(product);
     }
   }
 
-  void addProduct(Product product) {
-    _items.add(product);
+  Future<void> loadProducts() async {
+    _items.clear();
+    final response = await http.get(Uri.parse('$_baseUrl.json'));
+    if (response.body == 'null') return;
+
+    final Map<String, dynamic> data = jsonDecode(response.body);
+
+    data.forEach((productId, productData) {
+      _items.add(
+        Product(
+          id: productId,
+          name: productData['name'],
+          description: productData['description'],
+          price: productData['price'],
+          imageUrl: productData['imageUrl'],
+          isFavorite: productData['isFavorite'],
+        ),
+      );
+    });
+
+    notifyListeners();
+
+    return Future.value();
+  }
+
+  Future<void> addProduct(Product product) async {
+    final url = Uri.parse('$_baseUrl.json');
+    final response = await http.post(
+      url,
+      body: product.toJson(),
+    );
+
+    final id = jsonDecode(response.body)['name'];
+
+    _items.add(Product(
+      id: id,
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      isFavorite: product.isFavorite,
+    ));
+
     notifyListeners();
   }
 
-  void updateProduct(Product product) {
+  Future<void> updateProduct(Product product) async {
     final index = _items.indexWhere((p) => p.id == product.id);
+    final url = Uri.parse('$_baseUrl/${product.id}.json');
 
     if (index >= 0) {
+      await http.patch(url, body: product.toJson());
       _items[index] = product;
       notifyListeners();
     }
+
+    Future.value();
   }
 
-  void removeProduct(Product product) {
-    _items.removeWhere((p) => p.id == product.id);
-    notifyListeners();
+  Future<void> removeProduct(Product product) async {
+    int index = _items.indexWhere((p) => p.id == product.id);
+    final url = Uri.parse('$_baseUrl/${product.id}.json');
+
+    if (index >= 0) {
+      final product = _items[index];
+
+      _items.remove(product);
+      notifyListeners();
+
+      final response = await http.delete(url);
+
+      if (response.statusCode >= 400) {
+        _items.insert(index, product);
+        notifyListeners();
+
+        throw CustomHttpException(
+          'Ocorreu um erro na exclusão do produto.',
+          response.statusCode,
+        );
+      }
+    }
   }
 
   int get itemsCount {
