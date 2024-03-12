@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shop/models/cart.dart';
+import 'package:shop/models/cart_item.dart';
 import 'package:shop/models/order.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,6 +17,35 @@ class OrderList with ChangeNotifier {
 
   int get itemsCount {
     return _items.length;
+  }
+
+  Future<void> loadOrders() async {
+    _items.clear();
+    final response = await http.get(Uri.parse('$_baseUrl.json'));
+    if (response.body == 'null') return;
+
+    final Map<String, dynamic> data = jsonDecode(response.body);
+
+    data.forEach((orderId, orderData) {
+      _items.add(
+        Order(
+          id: orderId,
+          total: orderData['total'],
+          date: DateTime.parse(orderData['date']),
+          products: (orderData['products'] as List<dynamic>).map((item) {
+            return CartItem(
+              id: item['id'],
+              productId: item['productId'],
+              name: item['title'],
+              quantity: item['quantity'],
+              price: item['price'],
+            );
+          }).toList(),
+        ),
+      );
+    });
+
+    notifyListeners();
   }
 
   Future<void> addOrder(Cart cart) async {
