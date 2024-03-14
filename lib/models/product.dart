@@ -23,7 +23,7 @@ class Product with ChangeNotifier {
   });
 
   Future<void> toggleFavorite() async {
-    final baseUrl = dotenv.env['BASE_URL']!;
+    final baseUrl = dotenv.env['PRODUCT_BASE_URL']!;
 
     isFavorite = !isFavorite;
     notifyListeners();

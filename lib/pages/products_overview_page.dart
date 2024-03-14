@@ -4,6 +4,7 @@ import 'package:shop/models/cart.dart';
 import 'package:shop/models/product_list.dart';
 
 import '../components/app_drawer.dart';
+import '../components/cart_info_bottom_bar.dart';
 import '../components/product_grid.dart';
 import '../utils/app_routes.dart';
 
@@ -44,6 +45,8 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
 
   @override
   Widget build(BuildContext context) {
+    final cart = Provider.of<Cart>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Minha Loja'),
@@ -93,6 +96,11 @@ class _ProductsOverviewPageState extends State<ProductsOverviewPage> {
           : ProductGrid(
               showFavoriteOnly: _showFavoriteOnly,
             ),
+      bottomNavigationBar: cart.itemCount >= 1
+          ? CartInfoBottomBar(
+              cart: cart,
+            )
+          : null,
       drawer: const AppDrawer(),
     );
   }
