@@ -3,12 +3,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:shop/models/order_list.dart';
 import 'package:shop/models/product_list.dart';
+import 'package:shop/pages/auth_page.dart';
 import 'package:shop/pages/orders_page.dart';
 import 'package:shop/pages/product_detail_page.dart';
 import 'package:shop/pages/product_page.dart';
 import 'package:shop/pages/products_overview_page.dart';
 import 'package:shop/utils/app_routes.dart';
 
+import 'models/auth.dart';
 import 'models/cart.dart';
 import 'pages/cart_page.dart';
 import 'pages/product_form_page.dart';
@@ -37,6 +39,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => OrderList(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => Auth(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -48,6 +53,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Lato',
         ),
         routes: {
+          AppRoutes.auth: (ctx) => const AuthPage(),
           AppRoutes.home: (ctx) => const ProductsOverviewPage(),
           AppRoutes.product_detail: (ctx) => const ProductDetailPage(),
           AppRoutes.cart: (ctx) => const CartPage(),
